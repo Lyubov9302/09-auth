@@ -3,7 +3,7 @@
 
 import css from "./NoteForm.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { NoteTag } from "../../types/note";
+import type { Tag } from "../../types/note";
 import { useRouter } from "next/navigation";
 import { useNoteDraftStore } from "../../lib/store/noteStore";
 import { createNote, createNotePost } from "@/lib/api/clientApi";
@@ -41,7 +41,7 @@ export default function NoteForm() {
     const values: createNotePost = {
       title: formData.get("title") as string,
       content: formData.get("content") as string,
-      tag: formData.get("tag") as NoteTag,
+      tag: formData.get("tag") as Tag,
     };
     mutationPost.mutate(values);
   };
