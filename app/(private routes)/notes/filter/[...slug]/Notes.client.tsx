@@ -55,7 +55,7 @@ export default function NotesClient({ category }: NotesClientProps) {
           Create note +
         </button>
       </header>
-      {data && data?.notes.length > 0 && <NoteList notes={data?.notes} />}
+      {data?.notes && data.notes.length > 0 && <NoteList notes={data.notes} />}
     </div>
   );
 }

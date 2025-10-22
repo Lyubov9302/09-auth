@@ -1,4 +1,4 @@
-import { fetchNoteById } from "@/api/api";
+import { fetchNoteById } from "@/lib/api/clientApi";
 import NoteDetails from "./NoteDetails.client";
 import {
   dehydrate,
