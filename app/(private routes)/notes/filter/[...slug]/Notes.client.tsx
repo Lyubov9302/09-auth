@@ -2,7 +2,7 @@
 
 import Pagination from "@/components/Pagination/Pagination";
 import SearchBox from "@/components/SearchBox/SearchBox";
-import { FetchNotes } from "@/lib/api";
+import fetchNotes from "@/lib/api/clientApi";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
@@ -21,7 +21,7 @@ export default function NotesClient({ category }: NotesClientProps) {
 
   const { data, isSuccess } = useQuery({
     queryKey: ["notes", searchValue, page, category],
-    queryFn: () => FetchNotes(searchValue, page, category),
+    queryFn: () => fetchNotes(searchValue, page, category),
     placeholderData: keepPreviousData,
     refetchOnMount: true,
   });
@@ -55,9 +55,7 @@ export default function NotesClient({ category }: NotesClientProps) {
           Create note +
         </button>
       </header>
-      {data !== undefined && data?.notes.length > 0 && (
-        <NoteList notes={data?.notes} />
-      )}
+      {data && data?.notes.length > 0 && <NoteList notes={data?.notes} />}
     </div>
   );
 }

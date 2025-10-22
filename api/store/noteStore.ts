@@ -1,22 +1,21 @@
+import { CreateNoteRequest } from "@/types/note";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { NoteTag } from "@/types/note";
-import { createNotePost } from "../api/clientApi";
 
 type NoteDraftStore = {
-    draft: createNotePost;
-  setDraft: (note: createNotePost) => void;
+  draft: CreateNoteRequest;
+  setDraft: (note: CreateNoteRequest) => void;
   clearDraft: () => void;
-}
+};
 
-const initialDraft: createNotePost = {
-  title: '',
-  content: '',
-  tag: 'Todo' as NoteTag,
+const initialDraft: CreateNoteRequest = {
+  title: "",
+  content: "",
+  tag: "Todo",
 };
 
 export const useNoteDraftStore = create<NoteDraftStore>()(
-  persist<NoteDraftStore>(
+  persist(
     (set) => ({
       draft: initialDraft,
       setDraft: (note) => set(() => ({ draft: note })),
@@ -24,6 +23,7 @@ export const useNoteDraftStore = create<NoteDraftStore>()(
     }),
     {
       name: "note-draft",
+      partialize: (state) => ({ draft: state.draft }),
     }
   )
 );

@@ -1,73 +1,23 @@
+
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import css from "./NoteForm.module.css";
-import * as Yup from "yup";
-import toast from "react-hot-toast";
-import { CreateNote } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { NoteTag } from "../../types/note";
 import { useRouter } from "next/navigation";
-import { useNoteDraftStore } from "@/lib/store/noteStore";
-import { CreateNoteRequest } from "@/types/note";
-
-const OrderSchema = Yup.object().shape({
-  title: Yup.string()
-    .min(3, "Title must be at least 3 characters")
-    .max(50, "Title must be at most 50 characters")
-    .required("Title is required"),
-  content: Yup.string().max(500, "Content must be at most 500 characters"),
-  tag: Yup.string()
-    .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
-    .required("Tag is required"),
-});
+import { useNoteDraftStore } from "../../lib/store/noteStore";
+import { createNote, createNotePost } from "@/lib/api/clientApi";
 
 export default function NoteForm() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { draft, setDraft, clearDraft } = useNoteDraftStore();
 
-  function onClose() {
-    router.back();
-  }
-
-  const createNoteMutate = useMutation({
-    mutationFn: (data: CreateNoteRequest) => CreateNote(data),
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      clearDraft();
-      onClose();
-    },
-    onError(error) {
-      toast.error(error.message);
-    },
-  });
-
-  async function handleSubmit(formData: FormData) {
-    const valueCreatedForm: CreateNoteRequest = {
-      title: (formData.get("title") as string) || "",
-      content: (formData.get("content") as string) || "",
-      tag:
-        (formData.get("tag") as
-          | "Todo"
-          | "Work"
-          | "Personal"
-          | "Meeting"
-          | "Shopping") || "Todo",
-    };
-
-    try {
-      await OrderSchema.validate(valueCreatedForm, { abortEarly: false });
-      createNoteMutate.mutate(valueCreatedForm);
-    } catch (error: unknown) {
-      if (error instanceof Yup.ValidationError) {
-        toast.error(error.errors.join(", "));
-      }
-    }
-  }
+    const { draft, setDraft, clearDraft } = useNoteDraftStore();
 
   const handleChange = (
     event: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setDraft({
       ...draft,
@@ -75,11 +25,29 @@ export default function NoteForm() {
     });
   };
 
+  const mutationPost = useMutation({
+    mutationFn: async ({ title, content, tag }: createNotePost) => {
+      const res = await createNote({ title, content, tag });
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myNoteHubKey"] });
+      clearDraft();
+      router.back();
+    },
+  });
+
+  const handleSubmit = (formData: FormData) => {
+    const values: createNotePost = {
+      title: formData.get("title") as string,
+      content: formData.get("content") as string,
+      tag: formData.get("tag") as NoteTag,
+    };
+    mutationPost.mutate(values);
+  };
+
   return (
-    <form
-      action={handleSubmit}
-      className={css.form}
-    >
+    <form className={css.form} action={handleSubmit}>
       <div className={css.formGroup}>
         <label htmlFor="title">Title</label>
         <input
@@ -87,12 +55,13 @@ export default function NoteForm() {
           type="text"
           name="title"
           className={css.input}
+          required
+          minLength={3}
+          maxLength={50}
           defaultValue={draft?.title}
           onChange={handleChange}
-          required
         />
       </div>
-
       <div className={css.formGroup}>
         <label htmlFor="content">Content</label>
         <textarea
@@ -100,6 +69,7 @@ export default function NoteForm() {
           name="content"
           rows={8}
           className={css.textarea}
+          maxLength={500}
           defaultValue={draft?.content}
           onChange={handleChange}
         />
@@ -127,15 +97,11 @@ export default function NoteForm() {
         <button
           type="button"
           className={css.cancelButton}
-          onClick={onClose}
+          onClick={() => router.back()}
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          className={css.submitButton}
-          disabled={false}
-        >
+        <button type="submit" className={css.submitButton}>
           Create note
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { FetchNotes } from "@/lib/api";
+import fetchNotes from "@/lib/api/clientApi";
 import {
   dehydrate,
   HydrationBoundary,
@@ -45,7 +45,7 @@ export default async function Notes({ params }: Props) {
 
   await queryClient.prefetchQuery({
     queryKey: ["notes", searchValue, page, category],
-    queryFn: () => FetchNotes(searchValue, page, category),
+    queryFn: () => fetchNotes(searchValue, page, category),
   });
 
   return (
