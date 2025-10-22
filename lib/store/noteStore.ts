@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { NoteTag } from "@/types/note";
+import { Tag } from "@/types/note";
 import { createNotePost } from "../api/clientApi";
 
 type NoteDraftStore = {
@@ -12,7 +12,7 @@ type NoteDraftStore = {
 const initialDraft: createNotePost = {
   title: '',
   content: '',
-  tag: 'Todo' as NoteTag,
+  tag: 'Todo' as Tag,
 };
 
 export const useNoteDraftStore = create<NoteDraftStore>()(
