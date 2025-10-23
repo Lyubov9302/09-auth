@@ -35,7 +35,7 @@ export default function NotesClient({ tag }: { tag?: string }) {
     <div className={css.app}>
       <div className={css.toolbar}>
         {<SearchBox value={searchWord} onChange={handleChange} />}
-        {data && data?.notes.length > 0 && (
+        {data?.notes && (
           <Pagination
             totalPages={data?.totalPages ?? 0}
             page={page}

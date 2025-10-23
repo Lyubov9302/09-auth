@@ -1,21 +1,27 @@
+
 import NoteForm from "@/components/NoteForm/NoteForm";
 import css from "./CreateNote.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Creating Note",
-  description: "Create your note.",
+  title: "Create Note",
+  description: "Page for a create a new note",
   openGraph: {
-    title: "Creating Note",
-    description: "Create the note you want.",
-    url: "https://07-routing-nextjs-brown-ten.vercel.app/notes/action/create",
+    title: "Create note",
+    description: "Page for a create a new note",
+    url: "https://08-zustand-ten-red.vercel.app/notes/action/create",
     images: [
-      { url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg" },
+      {
+        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Note Hub",
+      },
     ],
   },
 };
 
-export default function CreateNote() {
+const CreateNote = () => {
   return (
     <main className={css.main}>
       <div className={css.container}>
@@ -24,4 +30,6 @@ export default function CreateNote() {
       </div>
     </main>
   );
-}
+};
+
+export default CreateNote;
