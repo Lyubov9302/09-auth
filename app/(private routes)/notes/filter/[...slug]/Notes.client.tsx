@@ -12,6 +12,7 @@ import { useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
 
+
 export default function NotesClient({ tag }: { tag?: string }) {
   const [searchWord, setSearchWord] = useState<string>("");
   const [page, setPage] = useState(1);
