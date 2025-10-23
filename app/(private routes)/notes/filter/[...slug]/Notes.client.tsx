@@ -1,61 +1,53 @@
-"use client";
 
-import Pagination from "@/components/Pagination/Pagination";
-import SearchBox from "@/components/SearchBox/SearchBox";
-import fetchNotes from "@/lib/api/clientApi";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
+"use client";
 import css from "./page.module.css";
-import { useRouter } from "next/navigation";
+
+import fetchNotes from "@/lib/api/clientApi";
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Pagination from "@/components/Pagination/Pagination";
 import NoteList from "@/components/NoteList/NoteList";
 
-interface NotesClientProps {
-  category?: string;
-}
+import Link from "next/link";
+import { useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useDebouncedCallback } from "use-debounce";
 
-export default function NotesClient({ category }: NotesClientProps) {
-  const [searchValue, setSearchValue] = useState("");
+export default function NotesClient({ tag }: { tag?: string }) {
+  const [searchWord, setSearchWord] = useState<string>("");
   const [page, setPage] = useState(1);
-  const router = useRouter();
 
-  const { data, isSuccess } = useQuery({
-    queryKey: ["notes", searchValue, page, category],
-    queryFn: () => fetchNotes(searchValue, page, category),
+  const handleChange = useDebouncedCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchWord(event.target.value);
+      setPage(1);
+    },
+    1000,
+  );
+
+  const { data } = useQuery({
+    queryKey: ["myNoteHubKey", searchWord, page, tag],
+    queryFn: () => fetchNotes(searchWord, page, tag),
     placeholderData: keepPreviousData,
-    refetchOnMount: true,
   });
-
-  const totalPages = data?.totalPages ?? 0;
-
-  function onClickCreate() {
-    router.push("/notes/action/create");
-  }
-
-  const updateSearchWord = useDebouncedCallback((searchWord: string) => {
-    setSearchValue(searchWord);
-    setPage(1);
-  }, 500);
 
   return (
     <div className={css.app}>
-      <header className={css.toolbar}>
-        <SearchBox onChange={updateSearchWord} />
-        {isSuccess && totalPages > 1 && (
+      <div className={css.toolbar}>
+        {<SearchBox value={searchWord} onChange={handleChange} />}
+        {data && data?.notes.length > 0 && (
           <Pagination
+            totalPages={data?.totalPages ?? 0}
             page={page}
-            totalPages={totalPages}
-            onChange={setPage}
+            onPageChange={(newPage) => setPage(newPage)}
           />
         )}
-        <button
-          className={css.button}
-          onClick={onClickCreate}
-        >
-          Create note +
-        </button>
-      </header>
-      {data?.notes && <NoteList notes={data?.notes} />}
+        {
+          <Link className={css.button} href={"/notes/action/create"}>
+            Create note +
+          </Link>
+        }
+      </div>
+      { data?.notes && <NoteList notes={data?.notes} />}
     </div>
   );
 }
