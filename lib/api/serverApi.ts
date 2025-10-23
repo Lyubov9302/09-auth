@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import nextServer from "./api";
 import { Note } from "@/types/note";
-import { User } from "@/types/user";
+import { User } from "@/types/users";
 import { NoteHttpResponse } from "./clientApi";
 
 export default async function fetchNotesServer(
