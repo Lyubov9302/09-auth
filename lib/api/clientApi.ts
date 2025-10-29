@@ -59,11 +59,6 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface UserRegister {
-  username: string;
-  email: string;
-}
-
 export async function register(data: RegisterRequest) {
   const res = await nextServer.post<User>("/auth/register", data);
   return res.data;
@@ -96,7 +91,7 @@ export interface UpdateUserRequest {
   username: string;
 }
 
-export const getMeUpdate = async (payload: UpdateUserRequest) => {
+export const updateMe= async (payload: UpdateUserRequest) => {
   const res = await nextServer.patch<User>("/users/me", payload);
   return res.data;
 };
